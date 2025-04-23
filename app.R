@@ -18,37 +18,137 @@ ui <- fluidPage(
   useShinyjs(),
   theme = shinytheme("cerulean"),
   
+  tags$head(
+    tags$style(HTML("
+      .shiny-text-output {
+        white-space: pre-wrap;
+        overflow-x: hidden;
+      }
+    "))
+  ),
   tags$img(src = "header.png", style = "width: 100%; margin-bottom: 20px;"),
-  tags$hr(style = "margin-top: -10px; margin-bottom: 20px; border-top: 2px solid #007BFF;"),
+  tags$hr(style = "margin-top: -10px; margin-bottom: 20px; border-top: 2px solid #800000;"),
   
   fluidRow(
     column(
       width = 9,
-      h4("Key Performance Indicators", style = "margin-top: 20px; font-weight: bold;"),
-      fluidRow(
-        column(4, wellPanel(style = "box-shadow: 0 2px 4px rgba(0,0,0,0.2); padding: 15px; background-color: #fff; border-radius: 6px;", textOutput("latestPrice"))),
-        column(4, wellPanel(style = "box-shadow: 0 2px 4px rgba(0,0,0,0.2); padding: 15px; background-color: #fff; border-radius: 6px;", textOutput("meanPrice"))),
-        column(4, wellPanel(style = "box-shadow: 0 2px 4px rgba(0,0,0,0.2); padding: 15px; background-color: #fff; border-radius: 6px;", textOutput("sdPrice")))
+      div(
+        style = "background-color: #fff5f5; padding: 0; border-radius: 6px; box-shadow: 0 2px 4px rgba(128,0,0,0.3); border: 1px solid #800000; margin-bottom: 20px;",
+        h3("Key Performance Indicators", style = "text-align: center; color: #800000; font-weight: bold;"),
+        fluidRow(
+          column(4,
+            div(
+              style = "background-color: #fff5f5; padding: 15px; margin-bottom: 15px; border-radius: 6px; box-shadow: 0 2px 4px rgba(128,0,0,0.2); text-align: center; border: 1px solid #800000;",
+              div(
+                title = "Most recent adjusted closing price in USD",
+                h3(textOutput("latestPrice", inline = TRUE), style = "margin: 0; color: #800000; font-weight: bold;"),
+                p("Latest Price", title = "This is the most recent adjusted stock price", style = "margin: 0; color: #800000; font-size: 13px; font-weight: 500;")
+              )
+            )
+          ),
+          column(4,
+            div(
+              style = "background-color: #fff5f5; padding: 15px; margin-bottom: 15px; border-radius: 6px; box-shadow: 0 2px 4px rgba(128,0,0,0.2); text-align: center; border: 1px solid #800000;",
+              div(
+                title = "Average adjusted price over the last 30 days",
+                h3(textOutput("meanPrice", inline = TRUE), style = "margin: 0; color: #800000; font-weight: bold;"),
+                p("30-Day Average", title = "Average of last 30 closing prices", style = "margin: 0; color: #800000; font-size: 13px; font-weight: 500;")
+              )
+            )
+          ),
+          column(4,
+            div(
+              style = "background-color: #fff5f5; padding: 15px; margin-bottom: 15px; border-radius: 6px; box-shadow: 0 2px 4px rgba(128,0,0,0.2); text-align: center; border: 1px solid #800000;",
+              div(
+                title = "Standard deviation of closing price over the last 30 days",
+                h3(textOutput("sdPrice", inline = TRUE), style = "margin: 0; color: #800000; font-weight: bold;"),
+                p("30-Day Std Dev", title = "Volatility of stock over the past 30 days", style = "margin: 0; color: #800000; font-size: 13px; font-weight: 500;")
+              )
+            )
+          )
+        ),
+        fluidRow(
+          column(4,
+            div(
+              style = "background-color: #fff5f5; padding: 15px; margin-bottom: 15px; border-radius: 6px; box-shadow: 0 2px 4px rgba(128,0,0,0.2); text-align: center; border: 1px solid #800000;",
+              div(
+                title = "Forecasted price from ARIMAX model",
+                h3(textOutput("arimaxPred", inline = TRUE), style = "margin: 0; color: #800000; font-weight: bold;"),
+                p("Predicted by ARIMAX", title = "Predicted next-day price by ARIMAX model", style = "margin: 0; color: #800000; font-size: 13px; font-weight: 500;")
+              )
+            )
+          ),
+          column(4,
+            div(
+              style = "background-color: #fff5f5; padding: 15px; margin-bottom: 15px; border-radius: 6px; box-shadow: 0 2px 4px rgba(128,0,0,0.2); text-align: center; border: 1px solid #800000;",
+              div(
+                title = "Forecasted price using naive model",
+                h3(textOutput("naivePred", inline = TRUE), style = "margin: 0; color: #800000; font-weight: bold;"),
+                p("Predicted by Naive", title = "Predicted next-day price assuming no change from today", style = "margin: 0; color: #800000; font-size: 13px; font-weight: 500;")
+              )
+            )
+          ),
+          column(4,
+            div(
+              style = "background-color: #fff5f5; padding: 15px; margin-bottom: 15px; border-radius: 6px; box-shadow: 0 2px 4px rgba(128,0,0,0.2); text-align: center; border: 1px solid #800000;",
+              div(
+                title = "Forecasted price from XGBoost model",
+                h3(textOutput("xgbPred", inline = TRUE), style = "margin: 0; color: #800000; font-weight: bold;"),
+                p("Predicted by XGBoost", title = "Predicted next-day price by XGBoost model", style = "margin: 0; color: #800000; font-size: 13px; font-weight: 500;")
+              )
+            )
+          )
+        )
       ),
-      h3("Stock Price Chart"),
-      wellPanel(style = "box-shadow: 0 2px 4px rgba(0,0,0,0.2); padding: 15px; background-color: #fff; border-radius: 6px;", plotOutput("stockPlot")),
-      h3("Forecast Plot"),
-      wellPanel(style = "box-shadow: 0 2px 4px rgba(0,0,0,0.2); padding: 15px; background-color: #fff; border-radius: 6px;", plotOutput("forecastPlot")),
-      p("This chart compares the predicted stock prices using three models:",
-        strong("ARIMAX (blue)"), ", ", strong("Naive (green)"), ", and ", strong("XGBoost (red)"), "."),
-      h3("Model Summary"),
-      verbatimTextOutput("modelSummary"),
-      h3("Model Comparison"),
-      verbatimTextOutput("modelCompare")
+      div(
+        style = "background-color: #fff5f5; padding: 0; border-radius: 6px; box-shadow: 0 2px 4px rgba(128,0,0,0.3); border: 1px solid #800000; margin-bottom: 20px;",
+        h3("Stock Price Chart", title = "Daily adjusted closing price for the selected stock", style = "text-align: center; color: #800000; font-weight: bold;"),
+        plotOutput("stockPlot")
+      ),
+      div(
+        style = "background-color: #fff5f5; padding: 0; border-radius: 6px; box-shadow: 0 2px 4px rgba(128,0,0,0.3); border: 1px solid #800000; margin-bottom: 20px;",
+        h3(
+          "Forecast Plot",
+          title = "This chart shows predicted stock prices over the next selected days using ARIMAX, Naive, and XGBoost models. Hover over lines to compare values.",
+          style = "text-align: center; color: #800000; font-weight: bold;"
+        ),
+        plotOutput("forecastPlot"),
+        p("This chart compares the predicted stock prices using three models:",
+          strong("ARIMAX (blue)"), ", ", strong("Naive (green)"), ", and ", strong("XGBoost (red)"), ".")
+      ),
+      div(
+        style = "background-color: #fff5f5; padding: 0; border-radius: 6px; box-shadow: 0 2px 4px rgba(128,0,0,0.3); border: 1px solid #800000; margin-top: 20px;",
+        h3(
+          "Model Forecast Breakdown",
+          title = "Each panel shows the predicted price trend from a specific model over the selected forecast horizon.",
+          style = "text-align: center; color: #800000; font-weight: bold;"
+        ),
+        plotOutput("comparisonPlot")
+      )
     ),
     column(
       width = 3,
-      wellPanel(
+      div(
+        style = "background-color: #fff5f5; padding: 20px; border-radius: 6px;
+                 box-shadow: 0 2px 4px rgba(128,0,0,0.3); border: 1px solid #800000;",
+        h4("Filters", style = "color: #800000; font-weight: bold; text-align: center; margin-bottom: 15px;"),
         textInput("stockSymbol", "Stock Symbol (e.g., NVDA):", value = "NVDA"),
         dateInput("startDate", "Start Date:", value = "2018-01-01"),
         dateInput("endDate", "End Date:", value = Sys.Date()),
         numericInput("forecastDays", "Days to Forecast:", value = 30, min = 7, max = 90),
         actionButton("goButton", "Apply Filters")
+      ),
+      div(
+        style = "margin-top: 20px; background-color: #fff5f5; padding: 15px; border-radius: 6px; 
+                 box-shadow: 0 2px 4px rgba(128,0,0,0.2); border: 1px solid #800000;",
+        h4("Model Summary", style = "color: #800000; font-weight: bold; text-align: center;"),
+        verbatimTextOutput("modelSummary", placeholder = TRUE)
+      ),
+      div(
+        style = "margin-top: 15px; background-color: #fff5f5; padding: 15px; border-radius: 6px; 
+                 box-shadow: 0 2px 4px rgba(128,0,0,0.2); border: 1px solid #800000;",
+        h4("Model Comparison", style = "color: #800000; font-weight: bold; text-align: center;"),
+        verbatimTextOutput("modelCompare", placeholder = TRUE)
       )
     )
   )
@@ -66,26 +166,17 @@ server <- function(input, output) {
   
   output$latestPrice <- renderText({
     req(stock_data())
-    latest <- round(as.numeric(last(Ad(stock_data()))), 2)
-    paste("Latest Price: $", latest)
+    paste0("$", round(as.numeric(last(Ad(stock_data()))), 2))
   })
 
   output$meanPrice <- renderText({
     req(stock_data())
-    mean30 <- round(mean(tail(Ad(stock_data()), 30)), 2)
-    paste("30-Day Avg: $", mean30)
+    paste0("$", round(mean(tail(Ad(stock_data()), 30)), 2))
   })
 
   output$sdPrice <- renderText({
     req(stock_data())
-    sd30 <- round(sd(tail(Ad(stock_data()), 30)), 2)
-    paste("30-Day Std Dev: $", sd30)
-  })
-  
-  output$stockPlot <- renderPlot({
-    data <- stock_data()
-    price <- Ad(data)  # Adjusted close price
-    chartSeries(price, theme = chartTheme("white"), TA = NULL)
+    paste0("$", round(sd(tail(Ad(stock_data()), 30)), 2))
   })
   
   model_fit <- reactive({
@@ -124,38 +215,88 @@ server <- function(input, output) {
     )
   })
   
+  output$arimaxPred <- renderText({
+    fits <- model_fit()
+    paste0("$", round(as.numeric(tail(fits$arimax$mean, 1)), 2))
+  })
+
+  output$naivePred <- renderText({
+    fits <- model_fit()
+    paste0("$", round(as.numeric(tail(fits$naive$mean, 1)), 2))
+  })
+
+  output$xgbPred <- renderText({
+    fits <- model_fit()
+    paste0("$", round(as.numeric(tail(fits$xgb, 1)), 2))
+  })
+  
+  output$stockPlot <- renderPlot({
+    data <- stock_data()
+    price <- Ad(data)  # Adjusted close price
+    chartSeries(price, theme = chartTheme("white"), TA = NULL)
+  })
+  
   output$forecastPlot <- renderPlot({
     fits <- model_fit()
-    autoplot(fits$arimax, series = "ARIMAX Forecast") +
-      autolayer(fits$naive$mean, series = "Naive Forecast", PI = FALSE) +
-      autolayer(fits$xgb, series = "XGBoost Forecast", PI = FALSE) +
+    forecast_days <- input$forecastDays
+    future_index <- seq.Date(from = Sys.Date() + 1, by = "day", length.out = forecast_days)
+
+    df_forecast <- data.frame(
+      Day = future_index,
+      ARIMAX = as.numeric(fits$arimax$mean),
+      Naive = as.numeric(fits$naive$mean),
+      XGBoost = as.numeric(fits$xgb[1:forecast_days])
+    )
+
+    ggplot(df_forecast, aes(x = Day)) +
+      geom_line(aes(y = ARIMAX, color = "ARIMAX"), size = 1.1) +
+      geom_line(aes(y = Naive, color = "Naive"), size = 1.1) +
+      geom_line(aes(y = XGBoost, color = "XGBoost"), size = 1.1) +
+      scale_color_manual(values = c("ARIMAX" = "#800000", "Naive" = "#A0522D", "XGBoost" = "#CD5C5C")) +
       labs(
-        title = "Forecast Comparison: ARIMAX vs Naive vs XGBoost",
-        subtitle = "Each line shows predicted values for the selected forecast period",
-        x = "Days Ahead",
-        y = "Price ($)",
-        color = "Forecast Model"
+        title = "Forecast Comparison",
+        subtitle = "Aligned forecast across ARIMAX, Naive, and XGBoost",
+        y = "Price ($)", x = "Forecast Date", color = "Model"
       ) +
-      scale_color_manual(values = c("ARIMAX Forecast" = "#800000", "Naive Forecast" = "#A0522D", "XGBoost Forecast" = "#CD5C5C")) +
-      theme_minimal(base_family = "Helvetica") +
-      theme(
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        legend.position = "bottom"
-      )
+      theme_minimal() +
+      theme(legend.position = "bottom")
+  })
+
+  output$comparisonPlot <- renderPlot({
+    fits <- model_fit()
+    forecast_days <- input$forecastDays
+    future_index <- seq.Date(from = Sys.Date() + 1, by = "day", length.out = forecast_days)
+
+    df <- data.frame(
+      Day = rep(future_index, 3),
+      Price = c(as.numeric(fits$arimax$mean), as.numeric(fits$naive$mean), as.numeric(fits$xgb[1:forecast_days])),
+      Model = rep(c("ARIMAX", "Naive", "XGBoost"), each = forecast_days)
+    )
+
+    ggplot(df, aes(x = Day, y = Price, color = Model)) +
+      geom_line(size = 1.1) +
+      facet_wrap(~Model, ncol = 3, scales = "free_y") +
+      scale_color_manual(values = c("ARIMAX" = "#800000", "Naive" = "#A0522D", "XGBoost" = "#CD5C5C")) +
+      labs(title = "Individual Forecasts", x = "Date", y = "Predicted Price ($)") +
+      theme_minimal() +
+      theme(legend.position = "none")
   })
   
   output$modelSummary <- renderPrint({
     tryCatch({
-      fit <- model_fit()$arimax$model
-      cat("Model Summary (ARIMAX):\n\n")
-      print(summary(fit))
-      cat("\nInterpretation:\n")
-      cat("- This ARIMAX model uses Adjusted Close as the main variable and Volume as an external regressor.\n")
-      cat("- A good model has low residual autocorrelation and a low AIC.\n")
-      cat("- Use residual plots and RMSE/MAPE to judge performance beyond summary stats.\n")
+      fits <- model_fit()
+      fit <- fits$arimax$model
+      cat("MODEL SUMMARY\n")
+      cat("------------------------------------------------------------\n")
+      cat("ARIMAX  :  AIC =", AIC(fit), " | Order =", paste(fit$arma[c(1,6,2)], collapse = ","), "\n")
+      cat("Naive   :  No parameters, assumes flat prediction\n")
+      cat("XGBoost :  Gradient boosting on lag1, lag2, volume (50 rounds)\n\n")
+      cat("Usage Guidance:\n")
+      cat("- Use ARIMAX for data with stable trends.\n")
+      cat("- Naive is simple but effective in short horizons.\n")
+      cat("- XGBoost handles complex non-linear dependencies.\n")
     }, error = function(e) {
-      cat("Error generating summary:\n", e$message)
+      cat("Summary unavailable.")
     })
   })
   
@@ -164,23 +305,17 @@ server <- function(input, output) {
     actual_tail <- tail(fits$actual, input$forecastDays)
     n <- min(length(actual_tail), length(fits$arimax$mean), length(fits$naive$mean), length(fits$xgb))
     arimax_rmse <- sqrt(mean((actual_tail[1:n] - fits$arimax$mean[1:n])^2, na.rm = TRUE))
-    naive_rmse <- sqrt(mean((actual_tail[1:n] - fits$naive$mean[1:n])^2, na.rm = TRUE))
-    xgb_rmse <- sqrt(mean((actual_tail[1:n] - fits$xgb[1:n])^2, na.rm = TRUE))
-    
-    cat("Model Comparison:\n")
-    cat(sprintf("ARIMAX RMSE: %.2f\n", arimax_rmse))
-    cat(sprintf("Naive RMSE: %.2f\n", naive_rmse))
-    cat(sprintf("XGBoost RMSE: %.2f\n", xgb_rmse))
-    
-    cat("\nInterpretation:\n")
-    best_rmse <- min(c(arimax_rmse, naive_rmse, xgb_rmse))
-    if (best_rmse == arimax_rmse) {
-      cat("- ARIMAX performed best, capturing trend and volume influence effectively.\n")
-    } else if (best_rmse == xgb_rmse) {
-      cat("- XGBoost performed best, leveraging lag features and volume for improved forecasts.\n")
-    } else {
-      cat("- Naive model did surprisingly well, likely due to strong autocorrelation.\n")
-    }
+    naive_rmse  <- sqrt(mean((actual_tail[1:n] - fits$naive$mean[1:n])^2, na.rm = TRUE))
+    xgb_rmse    <- sqrt(mean((actual_tail[1:n] - fits$xgb[1:n])^2, na.rm = TRUE))
+
+    cat("RMSE COMPARISON\n")
+    cat("------------------------------------------------------------\n")
+    cat(sprintf("ARIMAX   : %.2f\n", arimax_rmse))
+    cat(sprintf("Naive    : %.2f\n", naive_rmse))
+    cat(sprintf("XGBoost  : %.2f\n", xgb_rmse))
+    cat("------------------------------------------------------------\n")
+    best_model <- c("ARIMAX", "Naive", "XGBoost")[which.min(c(arimax_rmse, naive_rmse, xgb_rmse))]
+    cat("Best Performing Model: ", best_model, "\n")
   })
 }
 
