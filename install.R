@@ -1,0 +1,1 @@
+install.packages(c("shiny", "ggplot2", "forecast", "xgboost", "quantmod", "shinythemes", "shinyjs","fmsb"))
