@@ -36,7 +36,7 @@ ui <- fluidPage(
         style = "background-color: #fff5f5; padding: 0 20px; border-radius: 6px; box-shadow: 0 2px 4px rgba(128,0,0,0.3); border: 1px solid #800000; margin-bottom: 20px;",
         h3("Key Performance Indicators", style = "text-align: center; color: #800000; font-weight: bold;"),
         fluidRow(
-          column(4,
+          column(2,
             div(
               style = "background-color: #fff5f5; padding: 15px; margin-bottom: 15px; border-radius: 6px; box-shadow: 0 4px 8px rgba(128,0,0,0.25); text-align: center; border: 1px solid #800000;",
               div(
@@ -46,7 +46,7 @@ ui <- fluidPage(
               )
             )
           ),
-          column(4,
+          column(2,
             div(
               style = "background-color: #fff5f5; padding: 15px; margin-bottom: 15px; border-radius: 6px; box-shadow: 0 4px 8px rgba(128,0,0,0.25); text-align: center; border: 1px solid #800000;",
               div(
@@ -56,13 +56,47 @@ ui <- fluidPage(
               )
             )
           ),
-          column(4,
+          column(2,
             div(
               style = "background-color: #fff5f5; padding: 15px; margin-bottom: 15px; border-radius: 6px; box-shadow: 0 4px 8px rgba(128,0,0,0.25); text-align: center; border: 1px solid #800000;",
               div(
                 title = "Standard deviation of closing price over the last 30 days",
                 h3(textOutput("sdPrice", inline = TRUE), style = "margin: 0; color: #800000; font-weight: bold;"),
                 p("30-Day Std Dev", title = "Volatility of stock over the past 30 days", style = "margin: 0; color: #800000; font-size: 13px; font-weight: 500;")
+              )
+            )
+          ),
+          column(2,
+            div( # ➡️ NEW: 30-Day Max
+              style = "background-color: #fff5f5; padding: 15px; margin-bottom: 15px; border-radius: 6px; 
+                      box-shadow: 0 4px 8px rgba(128,0,0,0.25); text-align: center; border: 1px solid #800000;",
+              div(
+                title = "Maximum adjusted price over the last 30 days",
+                h3(textOutput("maxPrice", inline = TRUE), style = "margin: 0; color: #800000; font-weight: bold;"),
+                p("30-Day Maximum", style = "margin: 0; color: #800000; font-size: 13px; font-weight: 500;")
+              )
+            )
+          ),
+          column(2,
+            div(
+              style = "background-color: #fff5f5; padding: 15px; margin-bottom: 15px; border-radius: 6px; 
+                      box-shadow: 0 4px 8px rgba(128,0,0,0.25); text-align: center; border: 1px solid #800000;",
+              div(
+                title = "Minimum adjusted price over the last 30 days",
+                h3(textOutput("minPrice", inline = TRUE), style = "margin: 0; color: #800000; font-weight: bold;"),
+                p("30-Day Minimum", style = "margin: 0; color: #800000; font-size: 13px; font-weight: 500;")
+              )
+            )
+          ),
+
+          column(2,
+            div(
+              style = "background-color: #fff5f5; padding: 15px; margin-bottom: 15px; border-radius: 6px; 
+                      box-shadow: 0 4px 8px rgba(128,0,0,0.25); text-align: center; border: 1px solid #800000;",
+              div(
+                title = "Price fluctuation range over last 30 days",
+                h3(textOutput("rangePrice", inline = TRUE), style = "margin: 0; color: #800000; font-weight: bold;"),
+                p("30-Day Price Range", style = "margin: 0; color: #800000; font-size: 13px; font-weight: 500;")
               )
             )
           )
@@ -98,6 +132,7 @@ ui <- fluidPage(
               )
             )
           )
+          
         )
       ),
       div(
@@ -207,6 +242,42 @@ server <- function(input, output) {
     paste0("$", round(sd(tail(Ad(stock_data()), 30)), 2))
   })
   
+  output$maxPrice <- renderText({
+    req(stock_data())
+    data <- Ad(stock_data())
+    if (length(data) >= 1) {
+      data_last30 <- tail(data, min(30, length(data)))  
+      max_val <- max(data_last30, na.rm = TRUE)
+      paste0("$", round(max_val, 2))
+    } else {
+      "N/A"
+    }
+  })
+
+  output$minPrice <- renderText({
+    req(stock_data())
+    data <- Ad(stock_data())
+    if (length(data) >= 1) {
+      data_last30 <- tail(data, min(30, length(data)))  # take last 30 or fewer points
+      min_val <- min(data_last30, na.rm = TRUE)
+      paste0("$", round(min_val, 2))
+    } else {
+      "N/A"
+    }
+  })
+
+  output$rangePrice <- renderText({
+    req(stock_data())
+    data <- Ad(stock_data())
+    if (length(data) >= 2) {
+      data_last30 <- tail(data, min(30, length(data)))
+      range_val <- max(data_last30, na.rm = TRUE) - min(data_last30, na.rm = TRUE)
+      paste0("$", round(range_val, 2))
+    } else {
+      "N/A"
+    }
+  })
+
   # Here's the magic: 3 different models trained and ready to predict 📈
   model_fit <- reactive({
     data <- stock_data()
