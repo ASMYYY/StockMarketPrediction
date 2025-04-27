@@ -1,1 +1,4 @@
-install.packages(c("shiny", "ggplot2", "forecast", "xgboost", "quantmod", "shinythemes", "shinyjs","fmsb"))
+install.packages(c(
+  "shiny", "shinythemes", "quantmod", "forecast", "ggplot2",
+  "tseries", "xgboost", "shinyjs", "fmsb", "tidyr", "scales"
+))
