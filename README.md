@@ -3,6 +3,7 @@
 This Shiny application forecasts NVDA stock prices using time-series models (ARIMAX, Naive) and machine learning models (XGBoost).
 The app also includes visual KPIs, model comparisons, forecast breakdowns, and confidence analysis features.
 
+Link: https://asmita-desai.shinyapps.io/stockmarketprediction/
 ---
 
 ## How to Run Locally
